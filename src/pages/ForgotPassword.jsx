@@ -11,12 +11,15 @@ export default function ForgotPassword() {
   const submit = async (e) => {
     e.preventDefault();
     setError("");
-    setMessage("");
+
+    // show message instantly
+    setMessage("If that email exists, a reset link has been sent.");
 
     try {
-      const res = await api.post("/api/auth/forgot-password", { email });
-      setMessage(res.data.message);
+      await api.post("/api/auth/forgot-password", { email });
     } catch (err) {
+      // if API fails, replace message with error
+      setMessage("");
       setError(err.response?.data?.message || "Something went wrong");
     }
   };
