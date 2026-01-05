@@ -41,7 +41,7 @@ export default function ResetPassword() {
 
       setTimeout(() => {
         navigate("/login");
-      }, 3000);
+      }, 1000);
     } catch (err) {
       setError(err.response?.data?.message || "Reset failed");
     }

@@ -29,7 +29,7 @@ export default function Register() {
 
       setTimeout(() => {
         navigate("/login");
-      }, 3000);
+      }, 1000);
     } catch (err) {
       // if backend fails, override message with error
       setMessage("");
