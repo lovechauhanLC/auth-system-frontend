@@ -1,7 +1,12 @@
 import axios from "axios";
 
+// CHANGE: Use Environment Variable
+// If VITE_API_URL exists (Vercel), use it. Otherwise use localhost.
+const BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:5001";
+
 const api = axios.create({
-  baseURL: "http://localhost:5001",
+  baseURL: BASE_URL,
+  withCredentials: true, // Important: Allows cookies to be sent/received
 });
 
 const getEmailFromToken = (token) => {
@@ -43,18 +48,24 @@ api.interceptors.response.use(
         return Promise.reject(error);
       }
 
-      const res = await api.post("/api/auth/refresh-token", {
-        email,
-        refreshToken,
-      });
+      try {
+        // Note: Using api.post here leverages the baseURL automatically
+        const res = await api.post("/api/auth/refresh-token", {
+          email,
+          refreshToken,
+        });
 
-      localStorage.setItem("accessToken", res.data.accessToken);
-      localStorage.setItem("refreshToken", res.data.refreshToken);
+        localStorage.setItem("accessToken", res.data.accessToken);
+        localStorage.setItem("refreshToken", res.data.refreshToken);
 
-      originalRequest.headers.Authorization =
-        `Bearer ${res.data.accessToken}`;
+        originalRequest.headers.Authorization =
+          `Bearer ${res.data.accessToken}`;
 
-      return api(originalRequest);
+        return api(originalRequest);
+      } catch (refreshError) {
+        // If refresh fails, log them out or reject
+        return Promise.reject(refreshError);
+      }
     }
 
     return Promise.reject(error);
